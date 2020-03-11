@@ -10,9 +10,9 @@ import signal_xsec_list as xsec_dict
 gROOT.SetBatch(True)
 
 #CRSRPath = '/Users/dekumar/MEGA/Fullwork/2017_Plotting/22102019/monoHROOT'
-CRSRPath = '/Users/ptiwari/cernbox/plottingTools/plots_norm/14012020_2016/bbDMRoot/2016_bkg_rootFiles'
+CRSRPath = '/Users/ptiwari/cernbox/Documents/plottingTools/plots_norm/11032020_2016/bbDMRoot'
 #SignalPath = '/Users/dekumar/MEGA/Fullwork/2017_Plotting/rootFiles_Signal'
-SignalPath = '/Users/ptiwari/cernbox/plottingTools/Signal_Histo_2016_02022020_official'
+SignalPath = '/Users/ptiwari/cernbox/Documents/plottingTools/2016_syst_sig'
 
 CRSRFiles = [CRSRPath+'/'+fl for fl in os.listdir(CRSRPath) if 'Recoil' in fl or 'MET' in fl]
 SignalFiles = [SignalPath+'/'+fl for fl in os.listdir(SignalPath) if '.root' in fl]
@@ -63,7 +63,10 @@ for infile in CRSRFiles:
     rootFile  = infile.split('/')[-1]
     reg       = rootFile.split('_')[3]+'_'+rootFile.split('_')[2]
     #print('reg', rootFile.split('_')[2]+'_'+rootFile.split('_')[3])
-
+    syst = ''
+    if '_up.root' in infile or '_down.root' in infile:
+        laststr = infile.split('/')[-1]
+        syst    = '_'+laststr.split("_")[-2]+'_'+laststr.split("_")[-1].replace('.root','')
     if ('MET' in infile and 'SR' not in infile):continue# or ('Recoil' not in infile): continue
     print ('running code for ',infile)
     reg = reg.replace('Zmumu','ZMUMU').replace('Zee','ZEE').replace('Wmunu','WMUNU').replace('Wenu','WENU').replace('Topmunu','TOPMUNU').replace('Topenu','TOPENU')
@@ -71,8 +74,8 @@ for infile in CRSRFiles:
     for hist in SRCRhistos:
         temp   = fin.Get(hist)
         hist=hist.replace('DIBOSON','diboson').replace('ZJets','zjets').replace('GJets','gjets').replace('QCD','qcd').replace('STop','singlet').replace('Top','tt').replace('WJets','wjets').replace('DYJets','dyjets')
-        newName   = 'bbDM2016_'+reg+'_'+str(hist)
-
+        newName   = 'bbDM2016_'+reg+'_'+str(hist)+syst
+        if not syst=='' and hist=='data_obs':continue
         if temp.Integral() == 0.0:
             HISTNAME=newName
             temp = TH1F(newName, newName, 4, array('d',bins))
