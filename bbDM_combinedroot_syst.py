@@ -101,29 +101,29 @@ def reBin(h_temp,bins):
 
 print ('xsec_dict.CSList_0',xsec_dict.CSList_0)
 
-SRCRhistos=['bkgSum','DIBOSON','ZJets','GJets','QCD','STop','Top','WJets','DYJets','data_obs']
+SRCRhistos=['bkgSum','DIBOSON','ZJets','GJets','QCD','SMH','STop','Top','WJets','DYJets','data_obs']
 
 bins= [200,250,350,500,1000]
 
 f=TFile("DataCardRootFiles/AllMETHistos_"+plot_tag+".root","RECREATE")
 
 for infile in CRSRFiles:
-    print ('checking code for ',infile)
+    # print ('checking code for ',infile)
     fin       =   TFile(infile,"READ")
     rootFile  = infile.split('/')[-1]
     reg       = rootFile.split('_')[3]+'_'+rootFile.split('_')[2]
-    #print('reg', rootFile.split('_')[2]+'_'+rootFile.split('_')[3])
+    # print('reg', rootFile.split('_')[2]+'_'+rootFile.split('_')[3])
     syst = ''
     if '_up.root' in infile or '_down.root' in infile:
         laststr = infile.split('/')[-1]
         syst    = '_'+laststr.split("_")[-2]+'_'+laststr.split("_")[-1].replace('.root','')
     if ('MET' in infile and 'SR' not in infile):continue# or ('Recoil' not in infile): continue
-    print ('running code for ',infile)
+    # print ('running code for ',infile)
     reg = reg.replace('ZmumuCR','ZMUMU').replace('ZeeCR','ZEE').replace('WmunuCR','WMU').replace('WenuCR','WE').replace('TopmunuCR','TOPMU').replace('TopenuCR','TOPE')
 
     for hist in SRCRhistos:
         temp   = fin.Get(hist)
-        hist=hist.replace('DIBOSON','diboson').replace('ZJets','zjets').replace('GJets','gjets').replace('QCD','qcd').replace('STop','singlet').replace('Top','tt').replace('WJets','wjets').replace('DYJets','dyjets')
+        hist = hist.replace('DIBOSON', 'diboson').replace('ZJets', 'zjets').replace('GJets', 'gjets').replace('QCD', 'qcd').replace('STop', 'singlet').replace('Top', 'tt').replace('WJets', 'wjets').replace('DYJets', 'dyjets').replace('STop', 'singlet').replace('SMH','smh')
         newName   = era_name+reg+'_'+str(hist)+syst
         if not syst=='' and hist=='data_obs':continue
         if temp.Integral() == 0.0:
@@ -148,17 +148,25 @@ for infile in CRSRFiles:
 
 for cat in ['1b','2b']:
     for infile in SignalFiles:
-        #print ('infile',infile)
+        # print ('infile',infile)
         fin = TFile(infile,"READ")
         rootFile = infile.split('/')[-1]
-        #print ('rootFile', rootFile.split('_'))
-        ma=rootFile.split('_')[6].strip('Ma')
-        mA=rootFile.split('_')[8].strip('MA')
+        # print ('rootFile', rootFile.split('_'))
+        if runOn2016:
+            ma=rootFile.split('_')[4].strip('Ma')
+            mA=rootFile.split('_')[6].strip('MA')       
+        else:
+            ma = rootFile.split('_')[9]
+            mA = rootFile.split('_')[11].strip('.root')
         if int(mA)==1200:
             print (ma)
-        sampStr = 'Ma'+ma+'_MChi1_MA'+mA
-        #Ma250_MChi1_MA1200
-        CS = xsec_dict.CSList_0[sampStr]
+        if runOn2016:
+            sampStr = 'Ma'+ma+'_MChi1_MA'+mA
+            CS = xsec_dict.CSList_0[sampStr]
+        else:
+            sampStr = 'ma_'+ma+'_mA_'+mA
+            CS = xsec_dict.CSList_150[sampStr]
+
         for syst in ['MET','weightB','weightEWK','weightTop','weightMET','weightEle','weightMu','weightPU','weightJEC','Res','En'] :
             if syst=='MET':
                 temp = fin.Get('h_reg_SR_'+cat+'_MET')
@@ -202,7 +210,7 @@ for cat in ['1b','2b']:
                     totalEvents = h_total.Integral()
                     temp.Scale((luminosity*CS)/(totalEvents))
                     samp = era_name+cat+'_SR_2HDMa_Ma'+ma+'_MChi1_MA'+mA+'_tb35_st_0p7_'+syst+'_'+ud
-                    #samp = era_name+cat+'_SR_2HDMa_Ma'+ma+'_MChi1_MA'+mA
+                    # samp = era_name+cat+'_SR_2HDMa_Ma'+ma+'_MChi1_MA'+mA
 
                     myHist = setHistStyle(temp,samp)
                     f.cd()
