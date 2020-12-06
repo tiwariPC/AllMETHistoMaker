@@ -26,10 +26,13 @@ runOn2018 = False
 
 if options.era_year == '2016':
     runOn2016 = True
+    rebin_ = True
 elif options.era_year == '2017':
     runOn2017 = True
+    rebin_ = False
 elif options.era_year == '2018':
     runOn2018 = True
+    rebin_ = False
 else:
     print('Please provide on which year you want to run?')
 
@@ -71,7 +74,6 @@ SignalFiles = [SignalPath+'/' +fl for fl in os.listdir(SignalPath) if '.root' in
 
 rebin_ = True
 
-
 def setHistStyle(h_temp2, newname, rebin=False):
     if rebin:
         h_temp = h_temp2.Rebin(len(bins)-1, "h_temp", array('d', bins))
@@ -110,7 +112,10 @@ for infile in CRSRFiles:
         if not syst=='' and hist=='data_obs':continue
         if temp.Integral() == 0.0:
             HISTNAME=newName
-            temp = TH1F(newName, newName, temp.GetXaxis().GetNbins(),200,1000)
+            if runOn2016:
+                temp = TH1F(newName, newName, temp.GetXaxis().GetNbins(),200,1000)
+            else:
+                temp = TH1F(newName, newName, temp.GetXaxis().GetNbins(),array('d', bins))
             # print ('=================',hist)
             # print ('=================',temp.GetXaxis().GetNbins())
             for bin in range(temp.GetXaxis().GetNbins()):
@@ -186,4 +191,6 @@ for cat in ['1b','2b']:
                     f.cd()
                     myHist.Write()
 print('*************DONE*************')
+print("Saved histograms in DataCardRootFiles/AllMETHistos_"+plot_tag+".root file")
+print('******************************')
 f.Close()
