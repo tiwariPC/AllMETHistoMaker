@@ -10,4 +10,6 @@ for h in tfile.GetListOfKeys():
 
 if bool_check:
     print('INCORRECT BINNING')
+else:
+    print('CORRECT BINNING')   
 print('Done')
