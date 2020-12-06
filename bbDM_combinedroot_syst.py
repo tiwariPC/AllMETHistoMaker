@@ -66,38 +66,21 @@ if options.plot_tag == None:
 else:
     plot_tag = options.plot_tag
 
-#CRSRPath = '/Users/dekumar/MEGA/Fullwork/2017_Plotting/22102019/monoHROOT'
-#CRSRPath = '/Users/ptiwari/cernBox/Documents/ExoPieCapper/plots_norm/analysis_plots_v18_06-04-00-HemAtSkim/bbDMRoot'
-#SignalPath = '/Users/dekumar/MEGA/Fullwork/2017_Plotting/rootFiles_Signal'
-#SignalPath = '/Users/ptiwari/cernBox/Documents/ExoPieCapper/analysis_histo_v18_06-04-00-HemAtSkim'
-
-CRSRFiles = [CRSRPath+'/'+fl for fl in os.listdir(CRSRPath) if 'Recoil' in fl or 'MET' in fl]
+CRSRFiles = [CRSRPath+'/' +fl for fl in os.listdir(CRSRPath) if ('_Recoil' in fl and 'CR' in fl) or ('_MET' in fl and 'SR' in fl)]
 SignalFiles = [SignalPath+'/' +fl for fl in os.listdir(SignalPath) if '.root' in fl and 'bbDM_2HDMa' in fl]
 
-# os.system('rm -rf DataCardRootFiles')
-# os.system('mkdir DataCardRootFiles')
+rebin_ = True
 
-
-def setHistStyle(h_temp,newname):
-    #h_temp=h_temp2.Rebin(len(bins)-1,"h_temp",array.array('d',bins))
+def setHistStyle(h_temp2,newname,rebin=False):
+    if rebin: 
+        h_temp=h_temp2.Rebin(len(bins)-1,"h_temp",array('d',bins))
+    else: h_temp = h_temp2
     h_temp.SetName(newname)
     h_temp.SetTitle(newname)
     h_temp.SetLineWidth(1)
     h_temp.SetMarkerColor(kBlack)
     h_temp.SetMarkerStyle(2)
     return h_temp
-
-
-def reBin(h_temp,bins):
-    h_temp=h_temp.Rebin(len(bins)-1,"h_temp",array.array('d',bins))
-    #h_temp.SetBinContent(len(bins)-1,h_temp.GetBinContent(len(bins)-1)+h_temp.GetBinContent(len(bins))) #Add overflow bin content to last bin
-    #h_temp.SetBinContent(len(bins),0.)
-    # h_temp.GetXaxis().SetRangeUser(200,1000)
-    #h_temp.SetMarkerColor(kBlack);
-    #h_temp.SetMarkerStyle(2);
-    return h_temp
-
-
 
 print ('xsec_dict.CSList_0',xsec_dict.CSList_0)
 
@@ -142,7 +125,7 @@ for infile in CRSRFiles:
             if temp.GetBinError(bin)<0:
                 temp.SetBinError(bin,0.0)
 
-        myHist = setHistStyle(temp,newName)
+        myHist = setHistStyle(temp,newName,rebin_)
         f.cd()
         myHist.Write()
 
@@ -189,7 +172,7 @@ for cat in ['1b','2b']:
                 samp = era_name+cat+'_SR_2HDMa_Ma'+ma+'_MChi1_MA'+mA+'_tb35_st_0p7'
                 #samp = era_name+cat+'_SR_2HDMa_Ma'+ma+'_MChi1_MA'+mA
 
-                myHist = setHistStyle(temp,samp)
+                myHist = setHistStyle(temp,samp,rebin_)
                 f.cd()
                 myHist.Write()
             else:
@@ -212,7 +195,7 @@ for cat in ['1b','2b']:
                     samp = era_name+cat+'_SR_2HDMa_Ma'+ma+'_MChi1_MA'+mA+'_tb35_st_0p7_'+syst+'_'+ud
                     # samp = era_name+cat+'_SR_2HDMa_Ma'+ma+'_MChi1_MA'+mA
 
-                    myHist = setHistStyle(temp,samp)
+                    myHist = setHistStyle(temp, samp, rebin_)
                     f.cd()
                     myHist.Write()
     print('\n')
