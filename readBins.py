@@ -4,11 +4,10 @@ tfile.cd()
 bool_check = False
 for h in tfile.GetListOfKeys():
     h = h.ReadObj()
-    if h.GetSize() !=6: ## the number of bins you want + 2 (for overflow and underflow)
+    if h.GetNbinsX() != 4:  # the number of bins you want
         bool_check = True
         if h.Integral()==0:
-            print(h.ClassName(), h.GetName(), h.GetSize())
-
+            print(h.GetName(), h.GetNbinsX(), h.Integral(), )
 
 if bool_check:
     print('INCORRECT BINNING')
