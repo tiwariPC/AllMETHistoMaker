@@ -72,7 +72,7 @@ else:
 CRSRFiles = [CRSRPath+'/' +fl for fl in os.listdir(CRSRPath) if ('_Recoil' in fl and 'CR' in fl) or ('_MET' in fl and 'SR' in fl)]
 SignalFiles = [SignalPath+'/' +fl for fl in os.listdir(SignalPath) if '.root' in fl and 'bbDM_2HDMa' in fl]
 
-rebin_ = True
+rebin_ = False
 
 def setHistStyle(h_temp2, newname, rebin=False):
     if rebin:
@@ -88,7 +88,10 @@ def setHistStyle(h_temp2, newname, rebin=False):
     
 SRCRhistos=['bkgSum','DIBOSON','ZJets','GJets','QCD','SMH','STop','Top','WJets','DYJets','data_obs']
 
-bins= [200,250,350,500,1000]
+bins = [200,250,350,500,1000]
+# binsv1 = [200, 240, 300, 400, 550, 1000]
+# binsv2 = [200, 235, 290, 400, 550, 1000]
+# binsv3 = [200, 230, 290, 410, 550, 1000]
 
 f=TFile("DataCardRootFiles/AllMETHistos_"+plot_tag+".root","RECREATE")
 
@@ -101,7 +104,7 @@ for infile in CRSRFiles:
     if '_up.root' in infile or '_down.root' in infile:
         laststr = infile.split('/')[-1]
         syst    = '_'+laststr.split("_")[-2]+'_'+laststr.split("_")[-1].replace('.root','')
-    if ('MET' in infile and 'SR' not in infile):continue# or ('Recoil' not in infile): continue
+    if ('MET' in infile and 'SR' not in infile): continue# or ('Recoil' not in infile): continue
     # print ('running code for ',infile)
     reg = reg.replace('ZmumuCR','ZMUMU').replace('ZeeCR','ZEE').replace('WmunuCR','WMU').replace('WenuCR','WE').replace('TopmunuCR','TOPMU').replace('TopenuCR','TOPE')
 
@@ -112,10 +115,8 @@ for infile in CRSRFiles:
         if not syst=='' and hist=='data_obs':continue
         if temp.Integral() == 0.0:
             HISTNAME=newName
-            if runOn2016:
-                temp = TH1F(newName, newName, temp.GetXaxis().GetNbins(),200,1000)
-            else:
-                temp = TH1F(newName, newName, temp.GetXaxis().GetNbins(),array('d', bins))
+            temp = TH1F(newName, newName, temp.GetXaxis().GetNbins(),200,1000)
+            # temp = TH1F(newName, newName, temp.GetXaxis().GetNbins(),array('d', bins))
             # print ('=================',hist)
             # print ('=================',temp.GetXaxis().GetNbins())
             for bin in range(temp.GetXaxis().GetNbins()):
