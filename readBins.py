@@ -8,6 +8,10 @@ for h in tfile.GetListOfKeys():
         bool_check = True
         if h.Integral()==0:
             print(h.GetName(), h.GetNbinsX(), h.Integral(), )
+    for i in range(1, h.GetNbinsX()+1):
+        if h.GetBinContent(i) == 0:
+            print(h.GetName(),' bin'+str(i)+' ', h.GetBinContent(i))
+            
 
 if bool_check:
     print('INCORRECT BINNING')
