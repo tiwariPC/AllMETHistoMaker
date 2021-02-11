@@ -180,7 +180,7 @@ for cat in ['1b','2b']:
             sampStr = 'ma_'+ma+'_mA_'+mA
             CS = xsec_dict.CSList_150[sampStr]
 
-        for syst in ['MET','weightB','weightEWK','weightTop','weightMET','weightEle','weightMu','weightPU','weightJEC','Res','En','weightscale','weightpdf','weightPrefire'] :
+        for syst in ['MET','weightB','weightEWK','weightTop','weightMETrig','weightEleTrig', 'weightEleID', 'weightEleRECO', 'weightMuID', 'weightMuTRK','weightPU','Res','En','weightscale','weightpdf','weightPrefire','weightJECAbsolute','weightJECAbsolute_year','weightJECBBEC1','weightJECBBEC1_year','weightJECEC2','weightJECEC2_year','weightJECFlavorQCD','weightJECHF','weightJECHF_year','weightJECRelativeBal','weightJECRelativeSample_year'] :
             if syst=='MET':
                 temp = fin.Get('h_reg_SR_'+cat+'_MET')
                 if  temp.Integral() == 0.0:
