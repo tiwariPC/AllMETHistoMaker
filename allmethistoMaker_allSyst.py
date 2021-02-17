@@ -103,9 +103,9 @@ for infile in CRSRFiles:
     if '_up.root' in infile or '_down.root' in infile:
         laststr = infile.split('/')[-1]
         syst = '_'+laststr.split("_")[-2]+'_'+laststr.split("_")[-1].replace('.root','')
-        syst = syst.replace('_up','Up').replace('_down','Down').replace('weight','')
-
-    if ('MET' in infile and 'SR' not in infile): continue# or ('Recoil' not in infile): continue
+        syst = syst.replace('_up', 'Up').replace('_down', 'Down').replace(
+            'weight', '').replace('year', options.era_year)
+    if ('MET' in infile.split('/')[-1] and 'SR' not in infile.split('/')[-1]): continue# or ('Recoil' not in infile): continue
     # print ('running code for ',infile)
     reg = reg.replace('ZmumuCR','ZMUMU').replace('ZeeCR','ZEE').replace('WmunuCR','WMU').replace('WenuCR','WE').replace('TopmunuCR','TOPMU').replace('TopenuCR','TOPE')
 
@@ -154,6 +154,7 @@ for infile in CRSRFiles:
             for bin in range(1,temp.GetXaxis().GetNbins()+1):
                 temp_allbinUp.SetBinContent(bin, temp.GetBinContent(bin)+temp.GetBinError(bin))
                 temp_allbinDown.SetBinContent(bin, temp.GetBinContent(bin)-temp.GetBinError(bin))
+            # print(newName)
             myHist = setHistStyle(temp, newName, rebin_)
             myHist_allbinUp = setHistStyle(temp_allbinUp, newName_allbinUp, rebin_)
             myHist_allbinDown = setHistStyle(temp_allbinDown, newName_allbinDown, rebin_)
@@ -180,7 +181,7 @@ for cat in ['1b','2b']:
             sampStr = 'ma_'+ma+'_mA_'+mA
             CS = xsec_dict.CSList_150[sampStr]
 
-        for syst in ['MET','weightB','weightEWK','weightTop','weightMETrig','weightEleTrig', 'weightEleID', 'weightEleRECO', 'weightMuID', 'weightMuTRK','weightPU','Res','En','weightscale','weightpdf','weightPrefire','weightJECAbsolute','weightJECAbsolute_year','weightJECBBEC1','weightJECBBEC1_year','weightJECEC2','weightJECEC2_year','weightJECFlavorQCD','weightJECHF','weightJECHF_year','weightJECRelativeBal','weightJECRelativeSample_year'] :
+        for syst in ['MET','weightB','weightEWK','weightTop','weightMETtrig','weightEleTrig', 'weightEleID', 'weightEleRECO', 'weightMuID', 'weightMuTRK','weightPU','Res','En','weightscale','weightpdf','weightPrefire','weightJECAbsolute','weightJECAbsolute_year','weightJECBBEC1','weightJECBBEC1_year','weightJECEC2','weightJECEC2_year','weightJECFlavorQCD','weightJECHF','weightJECHF_year','weightJECRelativeBal','weightJECRelativeSample_year'] :
             if syst=='MET':
                 temp = fin.Get('h_reg_SR_'+cat+'_MET')
                 if  temp.Integral() == 0.0:
@@ -246,7 +247,8 @@ for cat in ['1b','2b']:
                     totalEvents = h_total.Integral()
                     temp.Scale((luminosity*CS)/(totalEvents))
                     samp = era_name+cat+'_SR_2HDMa_Ma'+ma+'_MChi1_MA'+mA+'_tb35_st_0p7_'+syst+'_'+ud
-                    samp = samp.replace('_up','Up').replace('_down','Down').replace('weight','')
+                    samp = samp.replace('_up', 'Up').replace('_down', 'Down').replace(
+                        'weight', '').replace('year', options.era_year)
                     myHist = setHistStyle(temp, samp, rebin_)
                     f.cd()
                     myHist.Write()
