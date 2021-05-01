@@ -70,7 +70,8 @@ else:
     plot_tag = options.plot_tag
 
 CRSRFiles = [CRSRPath+'/' +fl for fl in os.listdir(CRSRPath) if ('_Recoil' in fl and 'CR' in fl) or ('_MET' in fl and 'SR' in fl)]
-SignalFiles = [SignalPath+'/' +fl for fl in os.listdir(SignalPath) if '.root' in fl and 'bbDM_2HDMa' in fl]
+SignalFiles = [SignalPath+'/' + fl for fl in os.listdir(SignalPath) if '.root' in fl and ('bbDM_2HDMa' in fl or 'bbDM_DMSimp' in fl)]
+
 
 rebin_ = False
 
@@ -88,8 +89,8 @@ def setHistStyle(h_temp2, newname, rebin=False):
 
 SRCRhistos=['bkgSum','DIBOSON','ZJets','GJets','QCD','SMH','STop','Top','WJets','DYJets','data_obs']
 
-bins = [200,250,350,500,1000]
-# bins = [250,300,400,550,1000]
+# bins = [200,250,350,500,1000]
+bins = [250,300,400,550,1000]
 
 
 f=TFile("DataCardRootFiles/AllMETHistos_"+plot_tag+".root","RECREATE")
@@ -100,11 +101,15 @@ for infile in CRSRFiles:
     rootFile  = infile.split('/')[-1]
     reg       = rootFile.split('_')[3]+'_'+rootFile.split('_')[2]
     syst = ''
-    if '_up.root' in infile or '_down.root' in infile:
+    if 'Up.root' in infile or 'Down.root' in infile:
         laststr = infile.split('/')[-1]
-        syst = '_'+laststr.split("_")[-2]+'_'+laststr.split("_")[-1].replace('.root','')
-        syst = syst.replace('_up', 'Up').replace('_down', 'Down').replace(
-            'weight', '').replace('year', options.era_year)
+        #print('laststr',laststr)
+        # syst = '_'+laststr.split("_")[-1]+'_'+laststr.split("_")[-1].replace('.root','')
+        if '_MET_' in laststr:
+            syst = laststr.partition('MET')[-1].replace('.root','')
+        elif '_Recoil_' in laststr:
+            syst = laststr.partition('Recoil')[-1].replace('.root', '')
+        syst = syst.replace('year', options.era_year)
     if ('MET' in infile.split('/')[-1] and 'SR' not in infile.split('/')[-1]): continue# or ('Recoil' not in infile): continue
     # print ('running code for ',infile)
     reg = reg.replace('ZmumuCR','ZMUMU').replace('ZeeCR','ZEE').replace('WmunuCR','WMU').replace('WenuCR','WE').replace('TopmunuCR','TOPMU').replace('TopenuCR','TOPE')
@@ -116,7 +121,7 @@ for infile in CRSRFiles:
         if not syst=='' and hist=='data_obs':continue
         if temp.Integral() == 0.0:
             HISTNAME=newName
-            temp = TH1F(newName, newName, temp.GetXaxis().GetNbins(),200,1000)
+            temp = TH1F(newName, newName, temp.GetXaxis().GetNbins(),250,1000)
             # temp = TH1F(newName, newName, temp.GetXaxis().GetNbins(),array('d', bins))
             # print ('=================',hist)
             # print ('=================',temp.GetXaxis().GetNbins())
@@ -141,8 +146,8 @@ for infile in CRSRFiles:
             temp_allbinUp = temp.Clone('temp_allbinUp')
             temp_allbinDown = temp.Clone('temp_allbinDown')
             for bin in range(1,temp.GetXaxis().GetNbins()+1):
-                newName_up = era_name+reg+'_'+str(hist)+syst+'_bin'+str(bin)+'Up'
-                newName_down = era_name+reg+'_'+str(hist)+syst+'_bin'+str(bin)+'Down'
+                newName_up = era_name+reg+'_'+str(hist)+syst+'_eff_bin'+str(bin)+'Up'
+                newName_down = era_name+reg+'_'+str(hist)+syst+'_eff_bin'+str(bin)+'Down'
                 temp_up = temp.Clone('temp_up'+str(bin))
                 temp_down = temp.Clone('temp_down'+str(bin))
                 temp_up.SetBinContent(bin, temp.GetBinContent(bin)+temp.GetBinError(bin))
@@ -165,6 +170,8 @@ for infile in CRSRFiles:
 for cat in ['1b','2b']:
     for infile in SignalFiles:
         # print ('infile',infile)
+        if '2HDMa' in infile: whichSig = 1
+        elif 'DMSimp': whichSig = 0
         fin = TFile(infile,"READ")
         rootFile = infile.split('/')[-1]
         if runOn2016:
@@ -176,12 +183,16 @@ for cat in ['1b','2b']:
 
         if runOn2016:
             sampStr = 'Ma'+ma+'_MChi1_MA'+mA
-            CS = xsec_dict.CSList_0[sampStr]
+            CS = xsec_dict.hdma_xsList_0[sampStr]
         else:
-            sampStr = 'ma_'+ma+'_mA_'+mA
-            CS = xsec_dict.CSList_150[sampStr]
+            if whichSig == 1:
+                sampStr = 'ma_'+ma+'_mA_'+mA
+                CS = xsec_dict.hdma_xsList_150[sampStr]
+            elif whichSig == 0:
+                sampStr = 'mphi_'+ma+'_mchi_'+mA
+                CS = xsec_dict.dmsimp_xsList_150[sampStr]
 
-        for syst in ['MET','weightB','weightEWK','weightTop','weightMETtrig','weightEleTrig', 'weightEleID', 'weightEleRECO', 'weightMuID', 'weightMuTRK','weightPU','Res','En','weightscale','weightpdf','weightPrefire','weightJECAbsolute','weightJECAbsolute_year','weightJECBBEC1','weightJECBBEC1_year','weightJECEC2','weightJECEC2_year','weightJECFlavorQCD','weightJECHF','weightJECHF_year','weightJECRelativeBal','weightJECRelativeSample_year'] :
+        for syst in ['MET','CMSyear_eff_b','CMSyear_fake_b','EWK','CMSyear_Top','CMSyear_trig_met','CMSyear_trig_ele', 'CMSyear_EleID', 'CMSyear_EleRECO', 'CMSyear_MuID','CMSyear_MuISO', 'CMSyear_MuTRK','CMSyear_PU','En','CMSyear_mu_scale','CMSyear_pdf','CMSyear_prefire','JECAbsolute','JECAbsolute_year','JECBBEC1','JECBBEC1_year','JECEC2','JECEC2_year','JECFlavorQCD','JECHF','JECHF_year','JECRelativeBal','JECRelativeSample_year'] :
             if syst=='MET':
                 temp = fin.Get('h_reg_SR_'+cat+'_MET')
                 if  temp.Integral() == 0.0:
@@ -197,7 +208,10 @@ for cat in ['1b','2b']:
                 h_total = fin.Get('h_total_mcweight')
                 totalEvents = h_total.Integral()
                 temp.Scale((luminosity*CS)/(totalEvents))
-                samp = era_name+cat+'_SR_2HDMa_Ma'+ma+'_MChi1_MA'+mA+'_tb35_st_0p7'
+                if whichSig==1:
+                    samp = era_name+cat+'_SR_2HDMa_Ma'+ma+'_MChi1_MA'+mA+'_tb35_st_0p7'
+                elif whichSig == 0:
+                    samp = era_name+cat+'_SR_DMSimp_MPhi'+ma+'_MChi1'
                 myHist = setHistStyle(temp, samp, rebin_)
                 f.cd()
                 myHist.Write()
@@ -205,8 +219,12 @@ for cat in ['1b','2b']:
                 ## up and down
                 temp_allbinUp = temp.Clone('temp_allbinUp')
                 temp_allbinDown = temp.Clone('temp_allbinDown')
-                samp_allbinUp = era_name+cat+'_SR_2HDMa_Ma'+ma+'_MChi1_MA'+mA+'_tb35_st_0p7_allbinUp'
-                samp_allbinDown = era_name+cat+'_SR_2HDMa_Ma'+ma+'_MChi1_MA'+mA+'_tb35_st_0p7_allbinDown'
+                if whichSig == 1:
+                    samp_allbinUp = era_name+cat+'_SR_2HDMa_Ma'+ma+'_MChi1_MA'+mA+'_tb35_st_0p7_allbinUp'
+                    samp_allbinDown = era_name+cat+'_SR_2HDMa_Ma'+ma+'_MChi1_MA'+mA+'_tb35_st_0p7_allbinDown'
+                elif whichSig == 0:
+                    samp_allbinUp = era_name+cat+'_SR_DMSimp_MPhi'+ma+'_MChi1_allbinUp'
+                    samp_allbinDown = era_name+cat+'_SR_DMSimp_MPhi'+ma+'_MChi1_allbinDown'
                 for bin in range(temp_up.GetXaxis().GetNbins()):
                     temp_allbinUp.SetBinContent(bin, temp.GetBinContent(bin)+temp.GetBinError(bin))
                     temp_allbinDown.SetBinContent(bin, temp.GetBinContent(bin)-temp.GetBinError(bin))
@@ -217,8 +235,12 @@ for cat in ['1b','2b']:
                 for bin in range(1,temp.GetXaxis().GetNbins()+1):
                     temp_up = temp.Clone('temp_up'+str(bin))
                     temp_down = temp.Clone('temp_down'+str(bin))
-                    samp_up = era_name+cat+'_SR_2HDMa_Ma'+ma+'_MChi1_MA'+mA+'_tb35_st_0p7_bin'+str(bin)+'Up'
-                    samp_down = era_name+cat+'_SR_2HDMa_Ma'+ma+'_MChi1_MA'+mA+'_tb35_st_0p7_bin'+str(bin)+'Down'
+                    if whichSig == 1:
+                        samp_up = era_name+cat+'_SR_2HDMa_Ma'+ma+'_MChi1_MA'+mA+'_tb35_st_0p7_eff_bin'+str(bin)+'Up'
+                        samp_down = era_name+cat+'_SR_2HDMa_Ma'+ma+'_MChi1_MA'+mA+'_tb35_st_0p7_eff_bin'+str(bin)+'Down'
+                    elif whichSig == 0:
+                        samp_up = era_name+cat+'_SR_DMSimp_MPhi'+ma+'_MChi1_eff_bin'+str(bin)+'Up'
+                        samp_down = era_name+cat+'_SR_DMSimp_MPhi'+ma+'_MChi1_eff_bin'+str(bin)+'Down'
                     temp_up.SetBinContent(bin, temp.GetBinContent(bin)+temp.GetBinError(bin))
                     temp_down.SetBinContent(bin, temp.GetBinContent(bin)-temp.GetBinError(bin))
                     for bin in range(temp_up.GetXaxis().GetNbins()):
@@ -231,8 +253,8 @@ for cat in ['1b','2b']:
                     myHist_up.Write()
                     myHist_down.Write()
             else:
-                for ud in ['up','down']:
-                    temp = fin.Get('h_reg_SR_'+cat+'_MET_'+syst+'_'+ud)
+                for ud in ['Up','Down']:
+                    temp = fin.Get('h_reg_SR_'+cat+'_MET_'+syst+ud)
                     if  temp.Integral() == 0.0:
                         for bin in range(temp.GetXaxis().GetNbins()):
                             temp.SetBinContent(bin,0.00001)
@@ -246,9 +268,11 @@ for cat in ['1b','2b']:
                     h_total = fin.Get('h_total_mcweight')
                     totalEvents = h_total.Integral()
                     temp.Scale((luminosity*CS)/(totalEvents))
-                    samp = era_name+cat+'_SR_2HDMa_Ma'+ma+'_MChi1_MA'+mA+'_tb35_st_0p7_'+syst+'_'+ud
-                    samp = samp.replace('_up', 'Up').replace('_down', 'Down').replace(
-                        'weight', '').replace('year', options.era_year)
+                    if whichSig == 1:
+                        samp = era_name+cat+'_SR_2HDMa_Ma'+ma+'_MChi1_MA'+mA+'_tb35_st_0p7_'+syst+ud
+                    elif whichSig == 0:
+                        samp = era_name+cat+'_SR_DMSimp_MPhi'+ma+'_MChi1_'+syst+ud
+                    samp = samp.replace('year', options.era_year)
                     myHist = setHistStyle(temp, samp, rebin_)
                     f.cd()
                     myHist.Write()
