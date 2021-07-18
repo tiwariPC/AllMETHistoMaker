@@ -236,7 +236,8 @@ for cat in cats:
             uphist = "Unc_tf_"+cat+"_"+sr_bkg+"_to_"+cat+"_"+cr_bkg+"_"+pf+"Up"
             downhist = "Unc_tf_"+cat+"_"+sr_bkg+"_to_"+cat+"_"+cr_bkg+"_"+pf+"Down"
             if ("ZEE" in uphist or "WE" in uphist or "TOPE" in uphist) and ("Mu" in uphist or 'trig_met' in uphist):continue
-            if ("ZMUMU" in uphist or "WMU" in uphist or "TOPMU" in uphist) and ("Ele" in uphist or 'trig_ele' in uphist):continue
+            if ("ZMUMU" in uphist or "WMU" in uphist or "TOPMU" in uphist) and ("Ele" in uphist or 'trig_ele' in uphist or 'trig_met' in uphist ):continue
+            if ("WMU" in uphist or "TOPMU" in uphist or "WE" in uphist or "TOPE" in uphist) and ('eff_b' in uphist): continue
             uphist_dict.update({pf:uphist})
             downhist_dict.update({pf:downhist})
             hists.append(uphist_dict[pf])

@@ -148,7 +148,7 @@ for infile in CRSRFiles:
         hist = hist.replace('DIBOSON', 'diboson').replace('ZJets', 'zjets').replace('GJets', 'gjets').replace('QCD', 'qcd').replace('STop', 'singlet').replace('Top', 'tt').replace('WJets', 'wjets').replace('DYJets', 'dyjets').replace('STop', 'singlet').replace('SMH','smh')
         newName   = era_name+reg+'_'+str(hist)+syst
         if not syst=='' and hist=='data_obs':continue
-        if temp.Integral() <= 0.0:
+        if temp.Integral() <= 0.0: #<=$
             # temp = TH1F(newName, newName, temp.GetXaxis().GetNbins(),minBin,maxBin)
             temp = setHistBin(temp, newName, limit_var, True)
             for bin in range(1,temp.GetXaxis().GetNbins()+1):
@@ -156,7 +156,7 @@ for infile in CRSRFiles:
                 if temp.GetBinError(bin)<0:
                     temp.SetBinError(bin, 0.0)
         for bin in range(1,temp.GetXaxis().GetNbins()+1):
-            if temp.GetBinContent(bin)<= 0.0:
+            if temp.GetBinContent(bin)<= 0.0: #<=$
                 temp.SetBinContent(bin,0.00001)
             if temp.GetBinError(bin)<0:
                 temp.SetBinError(bin, 0.00)
@@ -179,9 +179,9 @@ for infile in CRSRFiles:
                 temp_up.SetBinContent(bin, temp.GetBinContent(bin)+temp.GetBinError(bin))
                 temp_down.SetBinContent(bin, temp.GetBinContent(bin)-temp.GetBinError(bin))
                 for bin in range(1, temp_up.GetXaxis().GetNbins()+1):
-                    if temp_up.GetBinContent(bin) <= 0.0:
+                    if temp_up.GetBinContent(bin) <= 0.0: #<=$
                         temp_up.SetBinContent(bin, 0.00001)
-                    if temp_down.GetBinContent(bin) <= 0:
+                    if temp_down.GetBinContent(bin) <= 0.0: #<=$
                         temp_down.SetBinContent(bin, 0.00001)
                 myHist_up = setHistStyle(temp_up, newName_up)
                 myHist_down = setHistStyle(temp_down, newName_down)
@@ -191,9 +191,9 @@ for infile in CRSRFiles:
                 temp_allbinUp.SetBinContent(bin, temp.GetBinContent(bin)+temp.GetBinError(bin))
                 temp_allbinDown.SetBinContent(bin, temp.GetBinContent(bin)-temp.GetBinError(bin))
                 for bin in range(1, temp_allbinUp.GetXaxis().GetNbins()+1):
-                    if temp_allbinUp.GetBinContent(bin) <= 0.0:
+                    if temp_allbinUp.GetBinContent(bin) <= 0.0: #<=$
                         temp_allbinUp.SetBinContent(bin, 0.00001)
-                    if temp_allbinDown.GetBinContent(bin) <= 0.0:
+                    if temp_allbinDown.GetBinContent(bin) <= 0.0: #<=$
                         temp_allbinDown.SetBinContent(bin, 0.00001)
             # print(newName)
             myHist = setHistStyle(temp, newName)
@@ -236,17 +236,16 @@ for cat in ['1b','2b']:
             elif whichSig == 0:
                 sampStr = 'mphi_'+ma+'_mchi_'+mA
                 CS = xsec_dict.dmsimp_xsList_150[sampStr]
-
         for syst in [limit_var,'CMSyear_eff_b','CMSyear_fake_b','EWK','CMSyear_Top','CMSyear_trig_met','CMSyear_trig_ele', 'CMSyear_EleID', 'CMSyear_EleRECO', 'CMSyear_MuID','CMSyear_MuISO', 'CMSyear_MuTRK','CMSyear_PU','En','CMSyear_mu_scale','CMSyear_pdf','CMSyear_prefire','JECAbsolute','JECAbsolute_year','JECBBEC1','JECBBEC1_year','JECEC2','JECEC2_year','JECFlavorQCD','JECHF','JECHF_year','JECRelativeBal','JECRelativeSample_year'] :
             if syst == limit_var:
                 temp = setHistBin(fin.Get('h_reg_SR_'+cat+'_'+limit_var), 'h_reg_SR_'+cat+'_'+limit_var, limit_var)
-                # if  temp.Integral() <= 0.0:
-                #     for bin in range(1,temp.GetXaxis().GetNbins()+1):
-                #         temp.SetBinContent(bin,0.00001)
-                #     if temp.GetBinError(bin)<0:
-                #         temp.SetBinError(bin,0.0)
+                if  temp.Integral() <= 0.0: #<=$
+                    for bin in range(1,temp.GetXaxis().GetNbins()+1):
+                        temp.SetBinContent(bin,0.00001)
+                    if temp.GetBinError(bin)<0:
+                        temp.SetBinError(bin,0.0)
                 for bin in range(1,temp.GetXaxis().GetNbins()+1):
-                    if temp.GetBinContent(bin) <= 0.0:
+                    if temp.GetBinContent(bin) <= 0.0: #<=$
                         temp.SetBinContent(bin,0.00001)
                     if temp.GetBinError(bin)<0:
                         temp.SetBinError(bin,0.0)
@@ -274,9 +273,9 @@ for cat in ['1b','2b']:
                     temp_allbinUp.SetBinContent(bin, temp.GetBinContent(bin)+temp.GetBinError(bin))
                     temp_allbinDown.SetBinContent(bin, temp.GetBinContent(bin)-temp.GetBinError(bin))
                     for bin in range(1, temp_allbinUp.GetXaxis().GetNbins()+1):
-                        if temp_allbinUp.GetBinContent(bin) <= 0.0:
+                        if temp_allbinUp.GetBinContent(bin) <= 0.0: #<=$
                             temp_allbinUp.SetBinContent(bin, 0.00001)
-                        if temp_allbinDown.GetBinContent(bin) <= 0.0:
+                        if temp_allbinDown.GetBinContent(bin) <= 0.0: #<=$
                             temp_allbinDown.SetBinContent(bin, 0.00001)
                 myHist_allbinUp = setHistStyle(temp_allbinUp, samp_allbinUp)
                 myHist_allbinDown = setHistStyle(temp_allbinDown, samp_allbinDown)
@@ -294,9 +293,9 @@ for cat in ['1b','2b']:
                     temp_up.SetBinContent(bin, temp.GetBinContent(bin)+temp.GetBinError(bin))
                     temp_down.SetBinContent(bin, temp.GetBinContent(bin)-temp.GetBinError(bin))
                     for bin in range(1,temp_up.GetXaxis().GetNbins()+1):
-                        if temp_up.GetBinContent(bin) <= 0.0:
+                        if temp_up.GetBinContent(bin) <= 0.0: #<=$
                             temp_up.SetBinContent(bin, 0.00001)
-                        if temp_down.GetBinContent(bin) <= 0:
+                        if temp_down.GetBinContent(bin) <= 0.0:  # <=$
                             temp_down.SetBinContent(bin, 0.00001)
                     myHist_up = setHistStyle(temp_up, samp_up)
                     myHist_down = setHistStyle(temp_down, samp_down)
@@ -305,28 +304,22 @@ for cat in ['1b','2b']:
             else:
                 for ud in ['Up','Down']:
                     temp = setHistBin(fin.Get('h_reg_SR_'+cat+'_'+limit_var+'_'+syst+ud), 'h_reg_SR_'+cat+'_'+limit_var+'_'+syst+ud, limit_var)
-                    if  temp.Integral() <= 0.0:
+                    if '_mu_scale' in syst:
+                        print(ma,mA, temp.Integral())
+                    if  temp.Integral() <= 0.0: #<=$
                         for bin in range(1,temp.GetXaxis().GetNbins()+1):
                             temp.SetBinContent(bin,0.00001)
                             if temp.GetBinError(bin)<0:
                                 temp.SetBinError(bin,0.0)
                     for bin in range(1,temp.GetXaxis().GetNbins()+1):
-                        if temp.GetBinContent(bin)<=0:
+                        if temp.GetBinContent(bin) == 0.0:  # <=$
                             temp.SetBinContent(bin,0.00001)
                         if temp.GetBinError(bin)<0:
                             temp.SetBinError(bin,0.0)
                     h_total = fin.Get('h_total_mcweight')
                     totalEvents = h_total.Integral()
                     temp.Scale((luminosity*CS)/(totalEvents))
-                    if '_pdf' in syst:
-                        temp_pdf = fin.Get('h_reg_SR_'+cat+'_'+limit_var)
-                        temp_pdf.Scale((luminosity*CS)/(h_total.Integral()))
-                        temp_pdf_Int = temp_pdf.Integral()
-                        if temp_pdf_Int == 0:
-                            temp_pdf_Int = 1
-                        print(ma, mA,ud, 'h_reg_SR_'+cat+'_'+limit_var, temp_pdf.Integral())
-                        temp.Scale(1/temp_pdf_Int)
-                        temp_pdf.Scale((h_total.Integral())/(luminosity*CS))
+
                     if whichSig == 1:
                         samp = era_name+cat+'_SR_2HDMa_Ma'+ma+'_MChi1_MA'+mA+'_tb35_st_0p7_'+syst+ud
                     elif whichSig <= 0:

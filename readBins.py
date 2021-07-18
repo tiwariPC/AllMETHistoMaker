@@ -13,11 +13,10 @@ for h in tfile.GetListOfKeys():
         # bin_list.append(h.GetXaxis().GetBinLabel(i))
         bin_list.append(h.GetBinWidth(i))
         val_list.append(h.GetBinContent(i))
-    print(h.GetName())
     # print([i < 0.0 for i in val_list], any([i < 0.0 for i in val_list]))
     if any([i<=0.0 for i in val_list]):
         print(h.GetName(),bin_list, val_list)
-        bool_check=False
+        bool_check=True
     # if h.GetNbinsX() != 4:  # the number of bins you want
     #     bool_check = True
     #     if h.Integral()==0:
@@ -27,7 +26,7 @@ for h in tfile.GetListOfKeys():
     #         print(h.GetName(),' bin'+str(i)+' ', h.GetBinContent(i))
 
 if bool_check:
-    print('INCORRECT BINNING')
+    print('INCORRECT BINNING or Negative Elements')
 else:
     print('CORRECT BINNING')
 print('Done')

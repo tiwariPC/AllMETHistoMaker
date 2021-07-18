@@ -39,13 +39,16 @@ else:
 ## macro is setup for the inverted transfer factors.
 
 def GetTF(sr_bkg, cr_bkg, postfix=""):
-    print ("histogram used for TF are:", sr_bkg+postfix, cr_bkg+postfix)
-    if postfix=="Prefire" or postfix=="JEC" or postfix=="allbin":h_sr_bkg = fin.Get(sr_bkg+postfix)
-    else:h_sr_bkg = fin.Get(sr_bkg)
+    # print ("histogram used for TF are:", sr_bkg+postfix, cr_bkg+postfix)
+    if 'JEC' in postfix or 'allbin' in postfix or 'eff_b' in postfix or 'fake_b' in postfix or 'EWK' in postfix or 'trig_met' in postfix:
+        h_sr_bkg = fin.Get(sr_bkg+postfix)
+    else:
+        h_sr_bkg = fin.Get(sr_bkg)
     h_cr_bkg = fin.Get(cr_bkg+postfix)
+
     tf_sr_cr = h_sr_bkg.Clone()
     tf_sr_cr.Divide(h_cr_bkg)
-    print ([tf_sr_cr.GetBinContent(i) for i in range(1,tf_sr_cr.GetNbinsX()+1)])
+    # print ([tf_sr_cr.GetBinContent(i) for i in range(1,tf_sr_cr.GetNbinsX()+1)])
     histname = ("tf_"+sr_bkg+"_to_"+cr_bkg+postfix).replace("bbDM2017_","").replace("bbDM2016_","").replace("bbDM2018_","")
     tf_sr_cr.SetName(histname)
     tf_sr_cr.SetTitle(histname)
@@ -67,22 +70,41 @@ def GetFracUncertainty(tfs):
     unc_down.SetName(name_down)
     return [unc_up,unc_down]
 
+def GetUncertainty(tfs):
+    tf= tfs[0].Clone()
+    tf_up = tfs[1].Clone()
+    tf_down = tfs[2].Clone()
+    unc_up = tfs[1].Clone()    ## up - central
+    unc_up.Add(tf,-1)
+    name_up = "Unc_"+tf_up.GetName()
+    unc_up.SetName(name_up)
+    unc_down = tfs[2].Clone()  ## central - down
+    unc_down.Add(tf,-1)
+    name_down = "Unc_"+tf_down.GetName()
+    unc_down.SetName(name_down)
+    print(unc_up.Integral(), unc_down.Integral())
+    return [unc_up,unc_down]
 
 ''' mode can be all, up, down, central
 syst: name of the systematics as in the AllMETHisto.root
 sr_bkg: bkg histo in SR
 cr_bkg: bkg histo in CR
 '''
-def GetAllTF(sr_bkg, cr_bkg,  syst="Prefire", mode="all",):
+def GetAllTF(sr_bkg, cr_bkg,  syst, bool_plt ,mode="all",):
     postfix=[]
     if mode=="all": postfix = ["Up","Down"]
     if mode=="up": postfix = ["Up"]
     if mode=="down": postfix = ["Down"]
     postfix= ["_"+syst+i for i in postfix]
+    print(sr_bkg, cr_bkg,  syst)
     central_ = GetTF(sr_bkg,cr_bkg)
     up_      = GetTF(sr_bkg,cr_bkg,postfix[0])
     down_    = GetTF(sr_bkg,cr_bkg,postfix[1])
-    return ([central_,up_,down_] + GetFracUncertainty([central_,up_,down_]) )
+    if bool_plt:
+        return ([central_, up_, down_] + GetFracUncertainty([central_, up_, down_]))
+    else:
+        # return ([central_, up_, down_] + GetFracUncertainty([central_, up_, down_]))
+        return ([central_, up_, down_] + GetUncertainty([central_, up_, down_]))
 
 def GetStatsUncTF(sr_bkg, cr_bkg, nbin=4):
     print ("reading histo: ",sr_bkg+"_binUp", cr_bkg+"_bin1Up")
@@ -99,8 +121,10 @@ def GetStatsUncTF(sr_bkg, cr_bkg, nbin=4):
 
 
 systematic_source = ['allbin','CMS'+options.year+'_eff_b','CMS'+options.year+'_fake_b','EWK','CMS'+options.year+'_Top','CMS'+options.year+'_trig_met','CMS'+options.year+'_trig_ele', 'CMS'+options.year+'_EleID', 'CMS'+options.year+'_EleRECO', 'CMS'+options.year+'_MuID','CMS'+options.year+'_MuISO', 'CMS'+options.year+'_MuTRK','CMS'+options.year+'_PU','En','CMS'+options.year+'_mu_scale','CMS'+options.year+'_pdf','CMS'+options.year+'_prefire','JECAbsolute','JECAbsolute_'+options.year,'JECBBEC1','JECBBEC1_'+options.year,'JECEC2','JECEC2_'+options.year,'JECFlavorQCD','JECHF','JECHF_'+options.year,'JECRelativeBal','JECRelativeSample_'+options.year]
+
 analysis='bbDM'+options.year
-alltfhists=[]
+alltfhistsforFIT = []
+alltfhistsforPlt = []
 for icat in ["1b", "2b"]:
     for isyst in systematic_source:
         gen_ = any([i for i in ['allbin', 'JECRelativeSample_'+options.year, 'JECFlavorQCD', 'En', 'CMS'+options.year+'_mu_scale', 'CMS'+options.year+'_pdf', 'JECAbsolute', 'JECRelativeBal', 'JECHF_'+options.year, 'CMS'+options.year+'_eff_b', 'CMS'+options.year+'_fake_b', 'JECEC2_'+options.year, 'JECHF', 'JECBBEC1_'+options.year, 'JECAbsolute_'+options.year, 'EWK', 'JECEC2', 'CMS'+options.year+'_prefire', 'JECBBEC1', 'CMS'+options.year+'_PU'] if isyst==i])
@@ -108,20 +132,31 @@ for icat in ["1b", "2b"]:
         for_mu = any([i for i in ['CMS'+options.year+'_trig_met', 'CMS'+options.year+'_MuID', 'CMS'+options.year+'_MuISO', 'CMS'+options.year+'_MuTRK'] if isyst==i])
         if for_mu or gen_:
             if icat=='1b':
-                tf_wmunu_wjets = GetAllTF(analysis+"_"+icat+"_SR_wjets",  analysis+"_"+icat+"_WMU_wjets", isyst);      alltfhists.append(tf_wmunu_wjets)
+                tf_wmunu_wjets = GetAllTF(analysis+"_"+icat+"_SR_wjets",  analysis+"_"+icat+"_WMU_wjets", isyst, True);      alltfhistsforFIT.append(tf_wmunu_wjets)
+                tf_wmunu_wjets = GetAllTF(analysis+"_"+icat+"_SR_wjets",  analysis+"_"+icat+"_WMU_wjets", isyst, False);      alltfhistsforPlt.append(tf_wmunu_wjets)
             if icat=='2b':
-                tf_topmu_top   = GetAllTF(analysis+"_"+icat+"_SR_tt"   ,  analysis+"_"+icat+"_TOPMU_tt" , isyst);      alltfhists.append(tf_topmu_top)
-            tf_zmumu_zj    = GetAllTF(analysis+"_"+icat+"_SR_zjets"   ,  analysis+"_"+icat+"_ZMUMU_dyjets" , isyst);      alltfhists.append(tf_zmumu_zj)
+                tf_topmu_top   = GetAllTF(analysis+"_"+icat+"_SR_tt"   ,  analysis+"_"+icat+"_TOPMU_tt" , isyst, True);      alltfhistsforFIT.append(tf_topmu_top)
+                tf_topmu_top   = GetAllTF(analysis+"_"+icat+"_SR_tt"   ,  analysis+"_"+icat+"_TOPMU_tt" , isyst, False);      alltfhistsforPlt.append(tf_topmu_top)
+            tf_zmumu_zj    = GetAllTF(analysis+"_"+icat+"_SR_zjets"   ,  analysis+"_"+icat+"_ZMUMU_dyjets" , isyst, True);      alltfhistsforFIT.append(tf_zmumu_zj)
+            tf_zmumu_zj    = GetAllTF(analysis+"_"+icat+"_SR_zjets"   ,  analysis+"_"+icat+"_ZMUMU_dyjets" , isyst, False);      alltfhistsforPlt.append(tf_zmumu_zj)
         if for_ele or gen_:
             if icat=='1b':
-                tf_wenu_wjets  = GetAllTF(analysis+"_"+icat+"_SR_wjets",  analysis+"_"+icat+"_WE_wjets" , isyst);      alltfhists.append(tf_wenu_wjets)
+                tf_wenu_wjets  = GetAllTF(analysis+"_"+icat+"_SR_wjets",  analysis+"_"+icat+"_WE_wjets" , isyst, True);      alltfhistsforFIT.append(tf_wenu_wjets)
+                tf_wenu_wjets  = GetAllTF(analysis+"_"+icat+"_SR_wjets",  analysis+"_"+icat+"_WE_wjets" , isyst, False);      alltfhistsforPlt.append(tf_wenu_wjets)
             if icat=='2b':
-                tf_topen_top   = GetAllTF(analysis+"_"+icat+"_SR_tt"   ,  analysis+"_"+icat+"_TOPE_tt"  , isyst);      alltfhists.append(tf_topen_top)
-            tf_zee_zj      = GetAllTF(analysis+"_"+icat+"_SR_zjets"   ,  analysis+"_"+icat+"_ZEE_dyjets"  , isyst);      alltfhists.append(tf_zee_zj)
+                tf_topen_top   = GetAllTF(analysis+"_"+icat+"_SR_tt"   ,  analysis+"_"+icat+"_TOPE_tt"  , isyst, True);      alltfhistsforFIT.append(tf_topen_top)
+                tf_topen_top   = GetAllTF(analysis+"_"+icat+"_SR_tt"   ,  analysis+"_"+icat+"_TOPE_tt"  , isyst, False);      alltfhistsforPlt.append(tf_topen_top)
+            tf_zee_zj      = GetAllTF(analysis+"_"+icat+"_SR_zjets"   ,  analysis+"_"+icat+"_ZEE_dyjets"  , isyst, True);      alltfhistsforFIT.append(tf_zee_zj)
+            tf_zee_zj      = GetAllTF(analysis+"_"+icat+"_SR_zjets"   ,  analysis+"_"+icat+"_ZEE_dyjets"  , isyst, False);      alltfhistsforPlt.append(tf_zee_zj)
+            print(tf_zee_zj)
 
 fout.cd()
-for isyst in alltfhists:
+for isyst in alltfhistsforPlt:
     for ihist in isyst:
+        # if '_trig_met' in ihist.GetName():
+        #     ihist.SetNameTitle((ihist.GetName()).replace('MU','E'),(ihist.GetName()).replace('MU','E'))
+        #     ihist.Write()
+        # else:
         ihist.Write()
 print("Histograms are added to bin/TF_"+plot_tag+".root")
 
@@ -145,7 +180,7 @@ if savetoAllMET:
     ROOT.gDirectory.mkdir("TOPE")
     fin.cd()
 
-    for isyst in alltfhists:
+    for isyst in alltfhistsforFIT:
         up_list = {}
         down_list = {}
         for ihist in isyst:
