@@ -76,7 +76,7 @@ else:
 # CRSRFiles = [CRSRPath+'/' +fl for fl in os.listdir(CRSRPath) if ('_'+limit_var in fl and 'CR' in fl) or ('_'+limit_var in fl and 'SR' in fl)]
 
 CRSRFiles = [CRSRPath+'/' + fl for fl in os.listdir(CRSRPath) if (
-    '_Recoil' in fl and 'CR' in fl) or ('_MET' in fl and 'SR' in fl) or ('_ctsValue' in fl)]
+    '_Recoil' in fl and 'CR' in fl and ('1b' in fl or '2j' in fl)) or ('_MET' in fl and 'SR' in fl and ('1b' in fl or '2j' in fl)) or ('_ctsValue' in fl)]
 
 SignalFiles = [SignalPath+'/' + fl for fl in os.listdir(
     SignalPath) if '.root' in fl and ('bbDM_2HDMa' in fl or 'bbDM_DMSimp' in fl)]
@@ -148,7 +148,7 @@ for infile in CRSRFiles:
         hist = hist.replace('DIBOSON', 'diboson').replace('ZJets', 'zjets').replace('GJets', 'gjets').replace('QCD', 'qcd').replace('STop', 'singlet').replace('Top', 'tt').replace('WJets', 'wjets').replace('DYJets', 'dyjets').replace('STop', 'singlet').replace('SMH','smh')
         newName   = era_name+reg+'_'+str(hist)+syst
         if not syst=='' and hist=='data_obs':continue
-        if temp.Integral() <= 0.0: #<=$
+        if temp.Integral() == 0.0: #<=$
             # temp = TH1F(newName, newName, temp.GetXaxis().GetNbins(),minBin,maxBin)
             temp = setHistBin(temp, newName, limit_var, True)
             for bin in range(1,temp.GetXaxis().GetNbins()+1):
@@ -156,7 +156,7 @@ for infile in CRSRFiles:
                 if temp.GetBinError(bin)<0:
                     temp.SetBinError(bin, 0.0)
         for bin in range(1,temp.GetXaxis().GetNbins()+1):
-            if temp.GetBinContent(bin)<= 0.0: #<=$
+            if temp.GetBinContent(bin)<=0: #==$
                 temp.SetBinContent(bin,0.00001)
             if temp.GetBinError(bin)<0:
                 temp.SetBinError(bin, 0.00)
@@ -172,16 +172,16 @@ for infile in CRSRFiles:
             temp_allbinUp = temp.Clone('temp_allbinUp')
             temp_allbinDown = temp.Clone('temp_allbinDown')
             for bin in range(1,temp.GetXaxis().GetNbins()+1):
-                newName_up = era_name+reg+'_'+str(hist)+syst+'_eff_bin'+str(bin)+'Up'
-                newName_down = era_name+reg+'_'+str(hist)+syst+'_eff_bin'+str(bin)+'Down'
+                newName_up = era_name+reg+'_'+str(hist)+syst+'_stat_bin'+str(bin)+'Up'
+                newName_down = era_name+reg+'_'+str(hist)+syst+'_stat_bin'+str(bin)+'Down'
                 temp_up = temp.Clone('temp_up'+str(bin))
                 temp_down = temp.Clone('temp_down'+str(bin))
                 temp_up.SetBinContent(bin, temp.GetBinContent(bin)+temp.GetBinError(bin))
                 temp_down.SetBinContent(bin, temp.GetBinContent(bin)-temp.GetBinError(bin))
                 for bin in range(1, temp_up.GetXaxis().GetNbins()+1):
-                    if temp_up.GetBinContent(bin) <= 0.0: #<=$
+                    if temp_up.GetBinContent(bin) <= 0.0: #==$
                         temp_up.SetBinContent(bin, 0.00001)
-                    if temp_down.GetBinContent(bin) <= 0.0: #<=$
+                    if temp_down.GetBinContent(bin) <= 0.0: #==$
                         temp_down.SetBinContent(bin, 0.00001)
                 myHist_up = setHistStyle(temp_up, newName_up)
                 myHist_down = setHistStyle(temp_down, newName_down)
@@ -191,9 +191,9 @@ for infile in CRSRFiles:
                 temp_allbinUp.SetBinContent(bin, temp.GetBinContent(bin)+temp.GetBinError(bin))
                 temp_allbinDown.SetBinContent(bin, temp.GetBinContent(bin)-temp.GetBinError(bin))
                 for bin in range(1, temp_allbinUp.GetXaxis().GetNbins()+1):
-                    if temp_allbinUp.GetBinContent(bin) <= 0.0: #<=$
+                    if temp_allbinUp.GetBinContent(bin) <= 0.0: #==$
                         temp_allbinUp.SetBinContent(bin, 0.00001)
-                    if temp_allbinDown.GetBinContent(bin) <= 0.0: #<=$
+                    if temp_allbinDown.GetBinContent(bin) <= 0.0: #==$
                         temp_allbinDown.SetBinContent(bin, 0.00001)
             # print(newName)
             myHist = setHistStyle(temp, newName)
@@ -239,13 +239,13 @@ for cat in ['1b','2b']:
         for syst in [limit_var,'CMSyear_eff_b','CMSyear_fake_b','EWK','CMSyear_Top','CMSyear_trig_met','CMSyear_trig_ele', 'CMSyear_EleID', 'CMSyear_EleRECO', 'CMSyear_MuID','CMSyear_MuISO', 'CMSyear_MuTRK','CMSyear_PU','En','CMSyear_mu_scale','CMSyear_pdf','CMSyear_prefire','JECAbsolute','JECAbsolute_year','JECBBEC1','JECBBEC1_year','JECEC2','JECEC2_year','JECFlavorQCD','JECHF','JECHF_year','JECRelativeBal','JECRelativeSample_year'] :
             if syst == limit_var:
                 temp = setHistBin(fin.Get('h_reg_SR_'+cat+'_'+limit_var), 'h_reg_SR_'+cat+'_'+limit_var, limit_var)
-                if  temp.Integral() <= 0.0: #<=$
+                if  temp.Integral() == 0.0: #<=$
                     for bin in range(1,temp.GetXaxis().GetNbins()+1):
                         temp.SetBinContent(bin,0.00001)
                     if temp.GetBinError(bin)<0:
                         temp.SetBinError(bin,0.0)
                 for bin in range(1,temp.GetXaxis().GetNbins()+1):
-                    if temp.GetBinContent(bin) <= 0.0: #<=$
+                    if temp.GetBinContent(bin) <= 0.0: #==$
                         temp.SetBinContent(bin,0.00001)
                     if temp.GetBinError(bin)<0:
                         temp.SetBinError(bin,0.0)
@@ -273,9 +273,9 @@ for cat in ['1b','2b']:
                     temp_allbinUp.SetBinContent(bin, temp.GetBinContent(bin)+temp.GetBinError(bin))
                     temp_allbinDown.SetBinContent(bin, temp.GetBinContent(bin)-temp.GetBinError(bin))
                     for bin in range(1, temp_allbinUp.GetXaxis().GetNbins()+1):
-                        if temp_allbinUp.GetBinContent(bin) <= 0.0: #<=$
+                        if temp_allbinUp.GetBinContent(bin) <= 0.0: #==$
                             temp_allbinUp.SetBinContent(bin, 0.00001)
-                        if temp_allbinDown.GetBinContent(bin) <= 0.0: #<=$
+                        if temp_allbinDown.GetBinContent(bin) <= 0.0: #==$
                             temp_allbinDown.SetBinContent(bin, 0.00001)
                 myHist_allbinUp = setHistStyle(temp_allbinUp, samp_allbinUp)
                 myHist_allbinDown = setHistStyle(temp_allbinDown, samp_allbinDown)
@@ -285,17 +285,17 @@ for cat in ['1b','2b']:
                     temp_up = temp.Clone('temp_up'+str(bin))
                     temp_down = temp.Clone('temp_down'+str(bin))
                     if whichSig == 1:
-                        samp_up = era_name+cat+'_SR_2HDMa_Ma'+ma+'_MChi1_MA'+mA+'_tb35_st_0p7_eff_bin'+str(bin)+'Up'
-                        samp_down = era_name+cat+'_SR_2HDMa_Ma'+ma+'_MChi1_MA'+mA+'_tb35_st_0p7_eff_bin'+str(bin)+'Down'
+                        samp_up = era_name+cat+'_SR_2HDMa_Ma'+ma+'_MChi1_MA'+mA+'_tb35_st_0p7_stat_bin'+str(bin)+'Up'
+                        samp_down = era_name+cat+'_SR_2HDMa_Ma'+ma+'_MChi1_MA'+mA+'_tb35_st_0p7_stat_bin'+str(bin)+'Down'
                     elif whichSig <= 0:
-                        samp_up = era_name+cat+'_SR_DMSimp_MPhi'+ma+'_MChi1_eff_bin'+str(bin)+'Up'
-                        samp_down = era_name+cat+'_SR_DMSimp_MPhi'+ma+'_MChi1_eff_bin'+str(bin)+'Down'
+                        samp_up = era_name+cat+'_SR_DMSimp_MPhi'+ma+'_MChi1_stat_bin'+str(bin)+'Up'
+                        samp_down = era_name+cat+'_SR_DMSimp_MPhi'+ma+'_MChi1_stat_bin'+str(bin)+'Down'
                     temp_up.SetBinContent(bin, temp.GetBinContent(bin)+temp.GetBinError(bin))
                     temp_down.SetBinContent(bin, temp.GetBinContent(bin)-temp.GetBinError(bin))
                     for bin in range(1,temp_up.GetXaxis().GetNbins()+1):
-                        if temp_up.GetBinContent(bin) <= 0.0: #<=$
+                        if temp_up.GetBinContent(bin) <= 0.0: #==$
                             temp_up.SetBinContent(bin, 0.00001)
-                        if temp_down.GetBinContent(bin) <= 0.0:  # <=$
+                        if temp_down.GetBinContent(bin) <= 0.0:  # ==$
                             temp_down.SetBinContent(bin, 0.00001)
                     myHist_up = setHistStyle(temp_up, samp_up)
                     myHist_down = setHistStyle(temp_down, samp_down)
@@ -304,22 +304,19 @@ for cat in ['1b','2b']:
             else:
                 for ud in ['Up','Down']:
                     temp = setHistBin(fin.Get('h_reg_SR_'+cat+'_'+limit_var+'_'+syst+ud), 'h_reg_SR_'+cat+'_'+limit_var+'_'+syst+ud, limit_var)
-                    if '_mu_scale' in syst:
-                        print(ma,mA, temp.Integral())
-                    if  temp.Integral() <= 0.0: #<=$
+                    if  temp.Integral() == 0.0: #<=$
                         for bin in range(1,temp.GetXaxis().GetNbins()+1):
                             temp.SetBinContent(bin,0.00001)
                             if temp.GetBinError(bin)<0:
                                 temp.SetBinError(bin,0.0)
                     for bin in range(1,temp.GetXaxis().GetNbins()+1):
-                        if temp.GetBinContent(bin) == 0.0:  # <=$
+                        if temp.GetBinContent(bin) <= 0.0:  # ==$
                             temp.SetBinContent(bin,0.00001)
                         if temp.GetBinError(bin)<0:
                             temp.SetBinError(bin,0.0)
                     h_total = fin.Get('h_total_mcweight')
                     totalEvents = h_total.Integral()
                     temp.Scale((luminosity*CS)/(totalEvents))
-
                     if whichSig == 1:
                         samp = era_name+cat+'_SR_2HDMa_Ma'+ma+'_MChi1_MA'+mA+'_tb35_st_0p7_'+syst+ud
                     elif whichSig <= 0:

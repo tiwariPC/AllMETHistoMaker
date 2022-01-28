@@ -39,12 +39,16 @@ else:
 ## macro is setup for the inverted transfer factors.
 
 def GetTF(sr_bkg, cr_bkg, postfix=""):
-    # print ("histogram used for TF are:", sr_bkg+postfix, cr_bkg+postfix)
-    if 'JEC' in postfix or 'allbin' in postfix or 'eff_b' in postfix or 'fake_b' in postfix or 'EWK' in postfix or 'trig_met' in postfix:
+    # print(sr_bkg, cr_bkg, postfix)
+    # print ("histogram used for TF are:", sr_bkg+postfix, cr_bkg+' '+postfix)
+    if 'JEC' in postfix or 'allbin' in postfix or 'eff_b' in postfix or 'fake_b' in postfix or 'EWK' in postfix or 'trig_met' in postfix or 'pdf' in postfix or 'mu_scale' in postfix:
         h_sr_bkg = fin.Get(sr_bkg+postfix)
     else:
         h_sr_bkg = fin.Get(sr_bkg)
-    h_cr_bkg = fin.Get(cr_bkg+postfix)
+    if ('trig_met' in postfix and 'E_' in cr_bkg) or ('eff_b' in postfix and 'Z' in cr_bkg) or ('fake_b' in postfix and 'Z' in cr_bkg):
+        h_cr_bkg = fin.Get(cr_bkg)
+    else:
+        h_cr_bkg = fin.Get(cr_bkg+postfix)
 
     tf_sr_cr = h_sr_bkg.Clone()
     tf_sr_cr.Divide(h_cr_bkg)
@@ -64,7 +68,7 @@ def GetFracUncertainty(tfs):
     name_up = "Unc_"+tf_up.GetName()
     unc_up.SetName(name_up)
     unc_down = tfs[2].Clone()  ## central - down
-    unc_down.Add(tf,-1)
+    unc_down.Add(tf, -1)
     unc_down.Divide(tf)
     name_down = "Unc_"+tf_down.GetName()
     unc_down.SetName(name_down)
@@ -82,7 +86,7 @@ def GetUncertainty(tfs):
     unc_down.Add(tf,-1)
     name_down = "Unc_"+tf_down.GetName()
     unc_down.SetName(name_down)
-    print(unc_up.Integral(), unc_down.Integral())
+    # print(unc_up.Integral(), unc_down.Integral())
     return [unc_up,unc_down]
 
 ''' mode can be all, up, down, central
@@ -96,7 +100,7 @@ def GetAllTF(sr_bkg, cr_bkg,  syst, bool_plt ,mode="all",):
     if mode=="up": postfix = ["Up"]
     if mode=="down": postfix = ["Down"]
     postfix= ["_"+syst+i for i in postfix]
-    print(sr_bkg, cr_bkg,  syst)
+    # print(sr_bkg, cr_bkg,  syst)
     central_ = GetTF(sr_bkg,cr_bkg)
     up_      = GetTF(sr_bkg,cr_bkg,postfix[0])
     down_    = GetTF(sr_bkg,cr_bkg,postfix[1])
@@ -107,7 +111,7 @@ def GetAllTF(sr_bkg, cr_bkg,  syst, bool_plt ,mode="all",):
         return ([central_, up_, down_] + GetUncertainty([central_, up_, down_]))
 
 def GetStatsUncTF(sr_bkg, cr_bkg, nbin=4):
-    print ("reading histo: ",sr_bkg+"_binUp", cr_bkg+"_bin1Up")
+    # print ("reading histo: ",sr_bkg+"_binUp", cr_bkg+"_bin1Up")
     sr_bin1up = fin.Get(sr_bkg+"_bin1Up")
     cr_bin1up = fin.Get(cr_bkg+"_bin1Up")
     tf_sr_cr_bin1up  = sr_bin1up.Clone()
@@ -116,7 +120,7 @@ def GetStatsUncTF(sr_bkg, cr_bkg, nbin=4):
     cr_bin1down = fin.Get(cr_bkg+"_bin1Down")
     tf_sr_cr_bin1down  = sr_bin1down.Clone()
     tf_sr_cr_bin1down.Divide(cr_bin1down)
-    print ([tf_sr_cr_bin1up.GetBinContent(i) for i in range(1,tf_sr_cr_bin1up.GetNbinsX()+1)])
+    # print ([tf_sr_cr_bin1up.GetBinContent(i) for i in range(1,tf_sr_cr_bin1up.GetNbinsX()+1)])
     return [tf_sr_cr_bin1up, tf_sr_cr_bin1down]
 
 
@@ -128,8 +132,8 @@ alltfhistsforPlt = []
 for icat in ["1b", "2b"]:
     for isyst in systematic_source:
         gen_ = any([i for i in ['allbin', 'JECRelativeSample_'+options.year, 'JECFlavorQCD', 'En', 'CMS'+options.year+'_mu_scale', 'CMS'+options.year+'_pdf', 'JECAbsolute', 'JECRelativeBal', 'JECHF_'+options.year, 'CMS'+options.year+'_eff_b', 'CMS'+options.year+'_fake_b', 'JECEC2_'+options.year, 'JECHF', 'JECBBEC1_'+options.year, 'JECAbsolute_'+options.year, 'EWK', 'JECEC2', 'CMS'+options.year+'_prefire', 'JECBBEC1', 'CMS'+options.year+'_PU'] if isyst==i])
-        for_ele = any([i for i in ['CMS'+options.year+'_trig_ele', 'CMS'+options.year+'_EleID', 'CMS'+options.year+'_EleRECO'] if isyst==i])
-        for_mu = any([i for i in ['CMS'+options.year+'_trig_met', 'CMS'+options.year+'_MuID', 'CMS'+options.year+'_MuISO', 'CMS'+options.year+'_MuTRK'] if isyst==i])
+        for_ele = any([i for i in ['CMS'+options.year+'_trig_ele', 'CMS'+options.year+'_EleID', 'CMS'+options.year+'_EleRECO', 'CMS'+options.year+'_trig_met'] if isyst==i])
+        for_mu = any([i for i in ['CMS'+options.year+'_MuID', 'CMS'+options.year+'_MuISO', 'CMS'+options.year+'_MuTRK', 'CMS'+options.year+'_trig_met'] if isyst==i])
         if for_mu or gen_:
             if icat=='1b':
                 tf_wmunu_wjets = GetAllTF(analysis+"_"+icat+"_SR_wjets",  analysis+"_"+icat+"_WMU_wjets", isyst, True);      alltfhistsforFIT.append(tf_wmunu_wjets)
@@ -148,15 +152,12 @@ for icat in ["1b", "2b"]:
                 tf_topen_top   = GetAllTF(analysis+"_"+icat+"_SR_tt"   ,  analysis+"_"+icat+"_TOPE_tt"  , isyst, False);      alltfhistsforPlt.append(tf_topen_top)
             tf_zee_zj      = GetAllTF(analysis+"_"+icat+"_SR_zjets"   ,  analysis+"_"+icat+"_ZEE_dyjets"  , isyst, True);      alltfhistsforFIT.append(tf_zee_zj)
             tf_zee_zj      = GetAllTF(analysis+"_"+icat+"_SR_zjets"   ,  analysis+"_"+icat+"_ZEE_dyjets"  , isyst, False);      alltfhistsforPlt.append(tf_zee_zj)
-            print(tf_zee_zj)
+            # print(tf_zee_zj)
 
 fout.cd()
-for isyst in alltfhistsforPlt:
+# for isyst in alltfhistsforPlt:
+for isyst in alltfhistsforFIT:
     for ihist in isyst:
-        # if '_trig_met' in ihist.GetName():
-        #     ihist.SetNameTitle((ihist.GetName()).replace('MU','E'),(ihist.GetName()).replace('MU','E'))
-        #     ihist.Write()
-        # else:
         ihist.Write()
 print("Histograms are added to bin/TF_"+plot_tag+".root")
 
@@ -174,10 +175,11 @@ if savetoAllMET:
     fin.cd()
     ROOT.gDirectory.mkdir("2b")
     fin.cd("2b")
-    ROOT.gDirectory.mkdir("ZMUMU")
-    ROOT.gDirectory.mkdir("ZEE")
     ROOT.gDirectory.mkdir("TOPMU")
     ROOT.gDirectory.mkdir("TOPE")
+    ROOT.gDirectory.mkdir("ZMUMU")
+    ROOT.gDirectory.mkdir("ZEE")
+
     fin.cd()
 
     for isyst in alltfhistsforFIT:
@@ -191,7 +193,7 @@ if savetoAllMET:
                     down_list.update({'_'.join(ihist.GetName().split('_')[9:]).replace('Down',''):ihist})
 
         fin.cd(up_list[list(up_list.keys())[0]].GetName().split('_')[2]+'/'+up_list[list(up_list.keys())[0]].GetName().split('_')[7])
-
+        # print(up_list[list(up_list.keys())[0]].GetName().split('_')[2]+'/'+up_list[list(up_list.keys())[0]].GetName().split('_')[7])
         for key in up_list:
             h_hist = up_list[key].Clone(key)
             h_hist.SetName(key)

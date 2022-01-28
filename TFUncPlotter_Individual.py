@@ -33,10 +33,9 @@ markerStyleUp=[20,21,22,23,29,33,34,47,43,39,41,45,20,21,22,23,29,33,34,47,43,39
 markerStyleDown=[24,25,26,32,30,27,28,46,42,37,40,44,24,25,26,32,30,27,28,46,42,37,40,44]
 linestyle = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 
-outputdirname = 'TFUncPlots_Overlay/'+plot_tag+'/'
+outputdirname = 'TFUncPlots_Individual/'+plot_tag+'/'
 if not os.path.exists(outputdirname):
     os.makedirs(outputdirname)
-outfile = TFile('TFUncPlots_Overlay/'+plot_tag+'/TFUncPlotter_overlay.root', 'RECREATE')
 def DrawOverlap(fileVec, histVec, titleVec,legendtext,pngname,logstatus=[0,0],xRange=[-99999,99999,1]):
 
     gStyle.SetOptTitle(0)
@@ -189,10 +188,6 @@ def DrawOverlap(fileVec, histVec, titleVec,legendtext,pngname,logstatus=[0,0],xR
         #histList[ih].GetTGaxis().SetMaxDigits(3);
 
         i=i+1
-    outfile.cd()
-    for histos in histList:
-        histos.Write()
-    # outfile.Write()
 
     pt = TPaveText(0.01,0.92,0.95,0.96,"brNDC")
     pt.SetBorderSize(0)
@@ -220,8 +215,8 @@ print ("calling the plotter")
 
 files = ['bin/TF_'+plot_tag+'.root']
 
-postfix=['CMS'+options.year+'_trig_ele', 'CMS'+options.year+'_EleID', 'CMS'+options.year+'_EleRECO','CMS'+options.year+'_trig_met', 'CMS'+options.year+'_MuID', 'CMS'+options.year+'_MuISO','CMS'+options.year+'_eff_b','CMS'+options.year+'_prefire', 'CMS'+options.year+'_fake_b', 'CMS'+options.year+'_mu_scale','CMS'+options.year+'_pdf' ]
-
+# postfix=['CMS'+options.year+'_trig_ele', 'CMS'+options.year+'_EleID', 'CMS'+options.year+'_EleRECO','CMS'+options.year+'_trig_met', 'CMS'+options.year+'_MuID', 'CMS'+options.year+'_MuISO','CMS'+options.year+'_eff_b','CMS'+options.year+'_prefire', 'CMS'+options.year+'_fake_b', 'CMS'+options.year+'_mu_scale','CMS'+options.year+'_pdf' ]
+postfix = ['allbin','CMS'+options.year+'_eff_b','CMS'+options.year+'_fake_b','CMS'+options.year+'_trig_met','CMS'+options.year+'_trig_ele', 'CMS'+options.year+'_EleID', 'CMS'+options.year+'_EleRECO', 'CMS'+options.year+'_MuID','CMS'+options.year+'_MuISO', 'CMS'+options.year+'_MuTRK','CMS'+options.year+'_PU','En','CMS'+options.year+'_mu_scale','CMS'+options.year+'_pdf','CMS'+options.year+'_prefire','JECAbsolute','JECAbsolute_'+options.year,'JECBBEC1','JECBBEC1_'+options.year,'JECEC2','JECEC2_'+options.year,'JECFlavorQCD','JECHF','JECHF_'+options.year,'JECRelativeBal','JECRelativeSample_'+options.year]
 
 # postfix = ['CMS'+options.year+'_eff_b', 'CMS'+options.year+'_mu_scale']
 # postfix=[ 'JECAbsolute', 'JECAbsolute_'+options.year, 'JECBBEC1', 'JECBBEC1_'+options.year, 'JECEC2', 'JECEC2_'+options.year,'JECFlavorQCD', 'JECHF' , 'JECHF_'+options.year, 'JECRelativeBal', 'JECRelativeSample_'+options.year]
@@ -234,10 +229,9 @@ postfix=['CMS'+options.year+'_trig_ele', 'CMS'+options.year+'_EleID', 'CMS'+opti
 
 # postfix = ['CMS'+options.year+'_EleID']
 
-legend_dict = {'CMS'+options.year+'_trig_ele': 'Ele Trig', 'CMS'+options.year+'_EleID': 'Ele ID', 'CMS'+options.year+'_EleRECO': 'Ele RECO', 'CMS'+options.year+'_trig_met': 'MET Trig', 'CMS'+options.year+'_MuID': 'Mu ID', 'CMS'+options.year+'_MuISO': 'Mu ISO', 'CMS'+options.year+'_MuTRK': 'Mu TRK', 'CMS'+options.year+'_eff_b': 'b-tag', 'CMS'+options.year+'_prefire': 'prefire', 'CMS'+options.year+'_mu_scale':'mu_scale', 'CMS'+options.year+'_pdf':'pdf','CMS'+options.year+'_fake_b':'fake_b'}
+legend_dict = {'allbin':'stat','CMS'+options.year+'_eff_b':'b-tag','CMS'+options.year+'_fake_b':'fake_b','CMS'+options.year+'_trig_met':'MET Trig','CMS'+options.year+'_trig_ele':'Ele Trig', 'CMS'+options.year+'_EleID':'Ele ID', 'CMS'+options.year+'_EleRECO':'Ele RECO', 'CMS'+options.year+'_MuID':'Mu ID','CMS'+options.year+'_MuISO':'Mu ISO', 'CMS'+options.year+'_MuTRK':'Mu TRK','CMS'+options.year+'_PU':'Pile Up','En':'En','CMS'+options.year+'_mu_scale':'mu scale','CMS'+options.year+'_pdf':'pdf','CMS'+options.year+'_prefire':'prefire','JECAbsolute':'JECAbsolute','JECAbsolute_'+options.year:'JECAbsolute_'+options.year,'JECBBEC1':'JECBBEC1','JECBBEC1_'+options.year:'JECBBEC1_'+options.year,'JECEC2':'JECEC2','JECEC2_'+options.year:'JECEC2_'+options.year,'JECFlavorQCD':'JECFlavorQCD','JECHF':'JECHF','JECHF_'+options.year:'JECHF_'+options.year,'JECRelativeBal':'JECRelativeBal','JECRelativeSample_'+options.year:'JECRelativeSample_'+options.year}
 
-# legend_dict = {'JECAbsolute': 'JECAbsolute', 'JECAbsolute_'+options.year: 'JECAbsolute_'+options.year, 'JECBBEC1': 'JECBBEC1', 'JECBBEC1_'+options.year: 'JECBBEC1_'+options.year, 'JECEC2': 'JECEC2', 'JECEC2_'+options.year: 'JECEC2_'+options.year, 'JECFlavorQCD': 'JECFlavorQCD', 'JECHF': 'JECHF', 'JECHF_'+options.year: 'JECHF_'+options.year, 'JECRelativeBal': 'JECRelativeBal', 'JECRelativeSample_'+options.year: 'JECRelativeSample_'+options.year}
-# legend_dict = {'CMS'+options.year+'_eff_b': 'b-tag'}
+
 
 ytitle = 'relative unc'
 
@@ -248,47 +242,30 @@ for cat in cats:
         SR_BKG = ['SR_zjets', 'SR_zjets', 'SR_wjets', 'SR_wjets']
         CR_BKG = ['ZEE_dyjets', 'ZMUMU_dyjets', 'WE_wjets', 'WMU_wjets']
 
-        # SR_BKG = ['SR_zjets', 'SR_wjets']
-        # CR_BKG = ['ZEE_dyjets', 'WE_wjets']
-
-        # SR_BKG = [ 'SR_wjets', 'SR_wjets']
-        # CR_BKG = ['ZEE_dyjets', 'ZMUMU_dyjets', 'WE_wjets', 'WMU_wjets']
-
         xtitle = 'Recoil [GeV]'
     elif '2b' in cat:
         SR_BKG = ['SR_zjets', 'SR_zjets', 'SR_tt', 'SR_tt']
         CR_BKG = ['ZEE_dyjets', 'ZMUMU_dyjets', 'TOPE_tt', 'TOPMU_tt']
 
-        # SR_BKG = ['SR_zjets', 'SR_tt']
-        # CR_BKG = ['ZEE_dyjets', 'TOPE_tt']
-
-
         xtitle = 'cos(#theta)*'
     axistitle = [xtitle, ytitle]
     for sr_bkg, cr_bkg in zip(SR_BKG,CR_BKG):
-        uphist_dict = {}
-        downhist_dict = {}
         hists = []
         legend = []
         for pf in postfix:
-            uphist = "Unc_tf_"+cat+"_"+sr_bkg+"_to_"+cat+"_"+cr_bkg+"_"+pf+"Up"
-            downhist = "Unc_tf_"+cat+"_"+sr_bkg+"_to_"+cat+"_"+cr_bkg+"_"+pf+"Down"
-            if ("ZEE" in uphist or "WE" in uphist or "TOPE" in uphist) and ("Mu" in uphist):
-                continue
-            if ("ZMUMU" in uphist or "WMU" in uphist or "TOPMU" in uphist) and ("Ele" in uphist or 'trig_ele' in uphist or 'trig_met' in uphist): continue
-            # if ("WMU" in uphist or "TOPMU" in uphist or "WE" in uphist or "TOPE" in uphist) and ('eff_b' in uphist):
-            #     continue
-            uphist_dict.update({pf:uphist})
-            downhist_dict.update({pf:downhist})
-            hists.append(uphist_dict[pf])
-            hists.append(downhist_dict[pf])
-            legend.append(legend_dict[pf]+" Up")
-            legend.append(legend_dict[pf]+" Down")
-        print ("hists",hists)
-        pngname = "Unc_tf_"+cat+"_"+sr_bkg+"_to_"+cat+"_"+cr_bkg
-        if '1b' in cat:
-            DrawOverlap(files,hists,axistitle,legend,pngname,[0,0],[250,1000])
-        elif '2b' in cat:
-            DrawOverlap(files,hists,axistitle,legend,pngname,[0,0],[0,1])
-
-outfile.Close()
+          uphist = "Unc_tf_"+cat+"_"+sr_bkg+"_to_"+cat+"_"+cr_bkg+"_"+pf+"Up"
+          downhist = "Unc_tf_"+cat+"_"+sr_bkg+"_to_"+cat+"_"+cr_bkg+"_"+pf+"Down"
+          if ("ZEE" in uphist or "WE" in uphist or "TOPE" in uphist) and ("Mu" in uphist):
+              continue
+          if ("ZMUMU" in uphist or "WMU" in uphist or "TOPMU" in uphist) and ("Ele" in uphist or 'trig_ele' in uphist or 'trig_met' in uphist): continue
+          # if ("WMU" in uphist or "TOPMU" in uphist or "WE" in uphist or "TOPE" in uphist) and ('eff_b' in uphist):
+          #     continue
+          hists = [uphist,downhist]
+          legend = [legend_dict[pf]+" Up",legend_dict[pf]+" Down"]
+          print ("legend",legend)
+          pngname = "Unc_tf_"+cat+"_"+sr_bkg+"_to_"+cat+"_"+cr_bkg+"_"+pf
+          if '1b' in cat:
+              print()
+              DrawOverlap(files,hists,axistitle,legend,pngname,[0,0],[250,1000])
+          elif '2b' in cat:
+              DrawOverlap(files,hists,axistitle,legend,pngname,[0,0],[0,1])

@@ -61,6 +61,7 @@ def addHistBinError(f,hist1,hist2):
     # f=ROOT.TFile.Open(infile)
     mainHist = f.Get(hist1)
     statsHist = f.Get(hist2)
+    # statsHist = f.Get(hist1)
     # statsHist.Add(mainHist,-1)
     bins = mainHist.GetXaxis().GetNbins()
     for ibin in range(1,bins+1):
@@ -122,8 +123,8 @@ def DrawOverlap(histList, titleVec,legendtext,pngname,logstatus=[0,0],xRange=[-9
         if logstatus[1] == 1 :
             # histList[ih].SetMaximum(1.5) #1.4 for log
             # histList[ih].SetMinimum(0.1) #1.4 for log
-            histList[ih].SetMaximum(maxi_*10)
-            histList[ih].SetMinimum(mini_*10)
+            histList[ih].SetMaximum(maxi_*20)
+            histList[ih].SetMinimum(mini_*20)
         if logstatus[1] == 0 :
             histList[ih].SetMaximum(maxi_)  # 1.4 for log
             histList[ih].SetMinimum(0) #1.4 for log
@@ -193,7 +194,7 @@ def DrawOverlap(histList, titleVec,legendtext,pngname,logstatus=[0,0],xRange=[-9
     pt.SetTextSize(0.046)
     pt.AddText(0.16,0.35,"#bf{CMS} #it{Internal}")
     if options.year == '2016':
-        pt.AddText(0.7, 0.35, "35.90fb^{-1}(13 TeV)")
+        pt.AddText(0.7, 0.35, "35.82fb^{-1}(13 TeV)")
     elif options.year == '2017':
         pt.AddText(0.7, 0.35, "41.50fb^{-1}(13 TeV)")
     elif options.year == '2018':
@@ -242,9 +243,10 @@ def plotTF(infile,postfix,cats):
             for pf in postfix:
                 UncHistname_up = "tf_"+cat+"_"+sr_bkg+"_to_"+cat+"_"+cr_bkg+"_"+pf+"Up"
                 UncHistname_down = "tf_"+cat+"_"+sr_bkg+"_to_"+cat+"_"+cr_bkg+"_"+pf+"Down"
-                if ("ZEE" in UncHistname_up or "WE" in UncHistname_up or "TOPE" in UncHistname_up) and ("Mu" in UncHistname_up or 'trig_met' in UncHistname_up): continue
-                if ("ZMUMU" in UncHistname_up or "WMU" in UncHistname_up or "TOPMU" in UncHistname_up) and ("Ele" in UncHistname_up or 'trig_ele' in UncHistname_up): continue
+                if ("ZEE" in UncHistname_up or "WE" in UncHistname_up or "TOPE" in UncHistname_up) and ("Mu" in UncHistname_up): continue
+                if ("ZMUMU" in UncHistname_up or "WMU" in UncHistname_up or "TOPMU" in UncHistname_up) and ("Ele" in UncHistname_up or 'trig_ele' in UncHistname_up or 'trig_met' in UncHistname_up): continue
                 if ("WMU" in UncHistname_up or "TOPMU" in UncHistname_up or "WE" in UncHistname_up or "TOPE" in UncHistname_up) and ('eff_b' in UncHistname_up): continue
+                # if ("WE" in UncHistname_up or "TOPE" in UncHistname_up or "WMU" in UncHistname_up or "TOPMU" in UncHistname_up) and ("_pdf" in UncHistname_up or "mu_scale" in UncHistname_up): continue
                 uncHists.append(UncHistname_up)
                 uncHists.append(UncHistname_down)
             print('uncHists',uncHists)
@@ -279,12 +281,14 @@ def plotTF(infile,postfix,cats):
 
 infile="bin/TF_"+plot_tag+".root"
 
-# postfix= ['allbin', 'CMS2017_eff_b', 'CMS2017_fake_b', 'CMS2017_trig_met', 'CMS2017_trig_ele', 'CMS2017_EleID', 'CMS2017_EleRECO', 'CMS2017_MuID', 'CMS2017_MuISO', 'CMS2017_MuTRK', 'CMS2017_PU', 'En', 'CMS2017_prefire', 'JECAbsolute', 'JECAbsolute_2017', 'JECBBEC1', 'JECBBEC1_2017', 'JECEC2', 'JECEC2_2017', 'JECFlavorQCD', 'JECHF', 'JECHF_2017', 'JECRelativeBal', 'JECRelativeSample_2017']
+postfix = ['CMS'+options.year+'_eff_b', 'CMS'+options.year+'_trig_met', 'CMS'+options.year+'_trig_ele', 'CMS'+options.year+'_EleID', 'CMS'+options.year+'_EleRECO', 'CMS'+options.year+'_MuID', 'CMS'+options.year+'_MuISO', 'CMS'+options.year+'_MuTRK','CMS'+options.year+'_prefire', 'JECAbsolute', 'JECAbsolute_'+options.year, 'JECBBEC1', 'JECBBEC1_'+options.year, 'JECEC2', 'JECEC2_'+options.year, 'JECFlavorQCD', 'JECHF', 'JECHF_'+options.year, 'JECRelativeBal', 'JECRelativeSample_'+options.year,'CMS'+options.year+'_mu_scale','CMS'+options.year+'_pdf']
 
-postfix = ['CMS'+options.year+'_eff_b', 'CMS'+options.year+'_trig_met', 'CMS'+options.year+'_trig_ele', 'CMS'+options.year+'_EleID', 'CMS'+options.year+'_EleRECO', 'CMS'+options.year+'_MuID', 'CMS'+options.year+'_MuISO', 'CMS'+options.year+'_MuTRK',]
+# postfix = ['CMS'+options.year+'_pdf']
+# postfix = ['CMS'+options.year+'_eff_b']
+# postfix = ['CMS'+options.year+'_mu_scale']
 
-# postfix = ['allbin']
-# ['CMS'+options.year+'_prefire', 'JECAbsolute', 'JECAbsolute_'+options.year+'', 'JECBBEC1', 'JECBBEC1_'+options.year+'', 'JECEC2', 'JECEC2_'+options.year+'', 'JECFlavorQCD', 'JECHF', 'JECHF_'+options.year+'', 'JECRelativeBal', 'JECRelativeSample_'+options.year+'','CMS'+options.year+'_PU']
+# postfix = ['CMS'+options.year+'_eff_b', 'CMS'+options.year+'_trig_met', 'CMS'+options.year+'_trig_ele', 'CMS'+options.year+'_EleID', 'CMS'+options.year+'_EleRECO', 'CMS'+options.year+'_MuID', 'CMS'+options.year+'_MuISO', 'CMS'+options.year+'_MuTRK','CMS'+options.year+'_prefire', 'JECAbsolute', 'JECAbsolute_'+options.year, 'JECBBEC1', 'JECBBEC1_'+options.year, 'JECEC2', 'JECEC2_'+options.year, 'JECFlavorQCD', 'JECHF', 'JECHF_'+options.year, 'JECRelativeBal', 'JECRelativeSample_'+options.year]
+
 
 
 plotTF(infile,postfix,['1b','2b'])
