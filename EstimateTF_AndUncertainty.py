@@ -39,9 +39,9 @@ else:
 ## macro is setup for the inverted transfer factors.
 
 def GetTF(sr_bkg, cr_bkg, postfix=""):
-    # print(sr_bkg, cr_bkg, postfix)
+    print(sr_bkg, cr_bkg, postfix)
     # print ("histogram used for TF are:", sr_bkg+postfix, cr_bkg+' '+postfix)
-    if 'JEC' in postfix or 'allbin' in postfix or 'eff_b' in postfix or 'fake_b' in postfix or 'EWK' in postfix or 'trig_met' in postfix or 'pdf' in postfix or 'mu_scale' in postfix:
+    if 'JEC' in postfix or 'allbin' in postfix or 'eff_b' in postfix or 'fake_b' in postfix or 'EWK' in postfix or 'trig_met' in postfix or 'pdf' in postfix or 'mu_scale' in postfix or '_En' in postfix:
         h_sr_bkg = fin.Get(sr_bkg+postfix)
     else:
         h_sr_bkg = fin.Get(sr_bkg)

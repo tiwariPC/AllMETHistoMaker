@@ -226,13 +226,6 @@ postfix=['CMS'+options.year+'_trig_ele', 'CMS'+options.year+'_EleID', 'CMS'+opti
 # postfix = ['CMS'+options.year+'_eff_b', 'CMS'+options.year+'_mu_scale']
 # postfix=[ 'JECAbsolute', 'JECAbsolute_'+options.year, 'JECBBEC1', 'JECBBEC1_'+options.year, 'JECEC2', 'JECEC2_'+options.year,'JECFlavorQCD', 'JECHF' , 'JECHF_'+options.year, 'JECRelativeBal', 'JECRelativeSample_'+options.year]
 
-# postfix = ['CMS'+options.year+'_pdf']
-
-# postfix = ['CMS'+options.year+'_eff_b']
-
-# postfix = ['CMS'+options.year+'_mu_scale']
-
-# postfix = ['CMS'+options.year+'_EleID']
 
 legend_dict = {'CMS'+options.year+'_trig_ele': 'Ele Trig', 'CMS'+options.year+'_EleID': 'Ele ID', 'CMS'+options.year+'_EleRECO': 'Ele RECO', 'CMS'+options.year+'_trig_met': 'MET Trig', 'CMS'+options.year+'_MuID': 'Mu ID', 'CMS'+options.year+'_MuISO': 'Mu ISO', 'CMS'+options.year+'_MuTRK': 'Mu TRK', 'CMS'+options.year+'_eff_b': 'b-tag', 'CMS'+options.year+'_prefire': 'prefire', 'CMS'+options.year+'_mu_scale':'mu_scale', 'CMS'+options.year+'_pdf':'pdf','CMS'+options.year+'_fake_b':'fake_b'}
 

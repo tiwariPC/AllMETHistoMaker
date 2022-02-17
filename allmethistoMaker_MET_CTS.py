@@ -224,8 +224,8 @@ for cat in ['1b','2b']:
         if runOn2016:
             if whichSig == 1:
                 sampStr = 'Ma'+ma+'_MChi1_MA'+mA
-                CS = xsec_dict.hdma_xsList_0[sampStr]
-                # CS = xsec_dict.hdma_xsList_150[sampStr]
+                # CS = xsec_dict.hdma_xsList_0[sampStr]
+                CS = xsec_dict.hdma_xsList_150[sampStr]
             elif whichSig == 0:
                 sampStr = 'mphi_'+ma+'_mchi_'+mA
                 CS = xsec_dict.dmsimp_xsList[sampStr]

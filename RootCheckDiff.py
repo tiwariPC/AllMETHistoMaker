@@ -35,8 +35,9 @@ for key in Keys:
 
         number1 = hist.Integral()
         number2 = hist2.Integral()
-
-        if number1!=number2:
+        threshold = abs((number1-number2)/number1)
+        # if number1!=number2:
+        if threshold > 0.01:
             print ("Difference in histogram:  ",histName)
             print ("integral from first file ", number1)
             print ("integral from second file ",number2)
